@@ -1,10 +1,18 @@
 // Task 1: Setting Up the Project
 // 1. Initialize a Window:
+// Set up a basic window using GLFW.
+// Create a main loop that keeps the window open.
+// 2. Initialize GLAD:
+// Set up GLAD to manage OpenGL function pointers.
+
+// 1. Initialize a Window:
 // * GLFW is initialized using `glfwInit()`.
 // * A window is created using `glfwCreateWindow()`.
 // * The window's OpenGL context is set as the current context with `glfwMakeContextCurrent()`.
 // 2. Initialize GLAD:
 // * GLAD is initialized with `gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)`.
+
+// https://learnopengl.com/Getting-started/Hello-Window
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -35,8 +43,8 @@ int main_task_1() {
         return -1;
     }
 
-    // Set the clear color to light blue
-    glClearColor(0.6f, 0.8f, 1.0f, 1.0f);
+    // Set the clear color
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
     // Main rendering loop
     while (!glfwWindowShouldClose(window)) {

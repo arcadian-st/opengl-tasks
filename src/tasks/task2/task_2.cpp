@@ -1,3 +1,15 @@
+// Task 2: Drawing Basic Shapes
+// 1. Drawing a Triangle:
+// Create a simple vertex and fragment shader.
+// Render a colored triangle using OpenGL.
+// 2. Drawing a Rectangle:
+// Expand your program to draw a colored rectangle.
+// 3. Drawing Basic Shapes:
+// Experiment with drawing other basic shapes like circles or lines.
+
+// Modularize the process by creating a function for shader initialization
+// and another function for rendering a shape.
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -18,11 +30,12 @@ const char* fragmentShaderSource = R"(
     }
 )";
 
-int main_task_2() {
+// Function to set up the window
+GLFWwindow* setupWindow() {
     // Initialize GLFW
     if (!glfwInit()) {
         std::cerr << "Failed to initialize GLFW" << std::endl;
-        return -1;
+        return nullptr;
     }
 
     // Configure GLFW
@@ -30,12 +43,14 @@ int main_task_2() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+    const int width = 800, height = 600;
+
     // Create a GLFW windowed mode window and its OpenGL context
-    GLFWwindow* window = glfwCreateWindow(800, 600, "OpenGL Window", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(width, height, "OpenGL Window", nullptr, nullptr);
     if (!window) {
         std::cerr << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
-        return -1;
+        return nullptr;
     }
 
     // Make the window's context current
@@ -45,9 +60,14 @@ int main_task_2() {
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         std::cerr << "Failed to initialize GLAD" << std::endl;
         glfwTerminate();
-        return -1;
+        return nullptr;
     }
 
+    return window;
+};
+
+// Function to initialize shaders
+unsigned int initializeShaders(const char* vertexShaderSource, const char* fragmentShaderSource) {
     // Load and compile shaders
     unsigned int vertexShader, fragmentShader;
     int success;
@@ -92,14 +112,107 @@ int main_task_2() {
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
-    // Vertex data for a triangle
+    return shaderProgram;
+}
+
+// Function to render a shape
+void renderShape(unsigned int VAO, unsigned int shaderProgram, int verticesCount) {
+    // Use the shader program
+    glUseProgram(shaderProgram);
+
+    // Bind the VAO
+    glBindVertexArray(VAO);
+
+    // Draw the shape
+    glDrawArrays(GL_TRIANGLE_FAN, 0, verticesCount);
+
+    // Unbind the VAO
+    glBindVertexArray(0);
+}
+
+struct shape_output
+{
+    unsigned int VAO;
+    unsigned int VBO;
+};
+
+// Function to set up a VAO and VBO for a shape
+shape_output setupShape(const float* vertices, int verticesCount) {
+    // Vertex Array Object (VAO) and Vertex Buffer Object (VBO)
+    unsigned int VAO, VBO;
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+
+    // Bind the VAO
+    glBindVertexArray(VAO);
+
+    // Bind and set vertex buffer
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, verticesCount * sizeof(float), vertices, GL_STATIC_DRAW);
+
+    // Set the vertex attribute pointers
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), nullptr);
+    glEnableVertexAttribArray(0);
+
+    // Unbind VAO and VBO
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
+    return shape_output{VAO, VBO};
+}
+
+// Main function to display a triangle
+int main_triangle() {
+    GLFWwindow* window = setupWindow();
+    if (!window) {
+        return -1;
+    }
+
     float vertices_triangle[] = {
         -0.5f, -0.5f,
          0.5f, -0.5f,
          0.0f,  0.5f
     };
 
-    // Vertex data for a rectangle
+    // Create shader program and VAO, VBO for the triangle
+    unsigned int shaderProgram = initializeShaders(vertexShaderSource, fragmentShaderSource);
+    auto [VAO_triangle, VBO_triangle] = setupShape(vertices_triangle, 6);
+
+    // Set the clear color
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+
+    // Main rendering loop
+    while (!glfwWindowShouldClose(window)) {
+        // Clear the color buffer
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        // Render the triangle
+        renderShape(VAO_triangle, shaderProgram, 3);
+
+        // Swap front and back buffers
+        glfwSwapBuffers(window);
+
+        // Poll for and process events
+        glfwPollEvents();
+    }
+
+    // Cleanup
+    glDeleteVertexArrays(1, &VAO_triangle);
+    glDeleteBuffers(1, &VBO_triangle);
+
+    // Terminate GLFW
+    glfwTerminate();
+
+    return 0;
+}
+
+// Main function to display a rectangle
+int main_rectangle() {
+    GLFWwindow* window = setupWindow();
+    if (!window) {
+        return -1;
+    }
+
     float vertices_rectangle[] = {
         -0.5f, -0.5f,
          0.5f, -0.5f,
@@ -107,68 +220,80 @@ int main_task_2() {
         -0.5f,  0.5f
     };
 
-    // Vertex Array Objects (VAOs) and Vertex Buffer Objects (VBOs)
-    unsigned int VAO_triangle, VBO_triangle, VAO_rectangle, VBO_rectangle;
-    glGenVertexArrays(1, &VAO_triangle);
-    glGenBuffers(1, &VBO_triangle);
+    // Create shader program and VAO, VBO for the rectangle
+    unsigned int shaderProgram = initializeShaders(vertexShaderSource, fragmentShaderSource);
+    auto [VAO_rectangle, VBO_rectangle] = setupShape(vertices_rectangle, 8);
 
-    glGenVertexArrays(1, &VAO_rectangle);
-    glGenBuffers(1, &VBO_rectangle);
-
-    // Bind the VAO for the triangle
-    glBindVertexArray(VAO_triangle);
-
-    // Bind and set vertex buffer for the triangle
-    glBindBuffer(GL_ARRAY_BUFFER, VBO_triangle);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices_triangle), vertices_triangle, GL_STATIC_DRAW);
-
-    // Set the vertex attribute pointers
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    // Unbind VAO and VBO for the triangle
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
-
-    // Bind the VAO for the rectangle
-    glBindVertexArray(VAO_rectangle);
-
-    // Bind and set vertex buffer for the rectangle
-    glBindBuffer(GL_ARRAY_BUFFER, VBO_rectangle);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices_rectangle), vertices_rectangle, GL_STATIC_DRAW);
-
-    // Set the vertex attribute pointers for the rectangle
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    // Unbind VAO and VBO for the rectangle
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
-
-    // Set the clear color to light blue
-    glClearColor(0.6f, 0.8f, 1.0f, 1.0f);
+    // Set the clear color
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
     // Main rendering loop
     while (!glfwWindowShouldClose(window)) {
         // Clear the color buffer
         glClear(GL_COLOR_BUFFER_BIT);
 
-        // Use the shader program for the triangle
-        glUseProgram(shaderProgram);
+        // Render the rectangle
+        renderShape(VAO_rectangle, shaderProgram, 4);
 
-        // Draw the triangle
-        glBindVertexArray(VAO_triangle);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        // Swap front and back buffers
+        glfwSwapBuffers(window);
 
-        // Use the shader program for the rectangle
-        glUseProgram(shaderProgram);
+        // Poll for and process events
+        glfwPollEvents();
+    }
 
-        // Draw the rectangle
-        glBindVertexArray(VAO_rectangle);
-        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+    // Cleanup
+    glDeleteVertexArrays(1, &VAO_rectangle);
+    glDeleteBuffers(1, &VBO_rectangle);
 
-        // Unbind VAO
-        glBindVertexArray(0);
+    // Terminate GLFW
+    glfwTerminate();
+
+    return 0;
+}
+
+// Main function to display a triangle and a rectangle side by side
+int main_two_shapes() {
+    GLFWwindow* window = setupWindow();
+    if (!window) {
+        return -1;
+    }
+
+    float vertices_triangle[] = {
+        -1.0f, -0.5f,
+         0.0f, -0.5f,
+        -0.5f,  0.5f
+    };
+
+    float vertices_rectangle[] = {
+        1.0f, -0.5f,
+        0.0f, -0.5f,
+        0.0f,  0.5f,
+        1.0f,  0.5f
+    };
+
+    // Create shader program
+    unsigned int shaderProgram = initializeShaders(vertexShaderSource, fragmentShaderSource);
+
+    // create VAO, VBO for the triangle
+    auto [VAO_triangle, VBO_triangle] = setupShape(vertices_triangle, 6);
+    
+    // create VAO, VBO for the rectangle
+    auto [VAO_rectangle, VBO_rectangle] = setupShape(vertices_rectangle, 8);
+
+    // Set the clear color
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+
+    // Main rendering loop
+    while (!glfwWindowShouldClose(window)) {
+        // Clear the color buffer
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        // Render the triangle
+        renderShape(VAO_triangle, shaderProgram, 3);
+
+        // Render the rectangle
+        renderShape(VAO_rectangle, shaderProgram, 4);
 
         // Swap front and back buffers
         glfwSwapBuffers(window);
@@ -185,6 +310,15 @@ int main_task_2() {
 
     // Terminate GLFW
     glfwTerminate();
+
+    return 0;
+}
+
+int main_task_2() {
+    // Call one of the main functions based on your requirement
+    // main_triangle();
+    // main_rectangle();
+    main_two_shapes();
 
     return 0;
 }

@@ -19,20 +19,16 @@ const char* vertexShaderSource = R"(
     #version 330 core
     layout (location = 0) in vec2 aPos;
     uniform mat4 transform; // Transformation matrix
-    out vec3 color;
     void main() {
-        color = (transform * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
-        gl_Position = vec4(aPos, 0.0, 1.0);
+        gl_Position = transform * vec4(aPos, 0.0, 1.0);
     }
 )";
 
 const char* fragmentShaderSource = R"(
     #version 330 core
     out vec4 FragColor;
-    in vec3 color;
     void main() {
         FragColor = vec4(1.0, 0.5, 0.2, 1.0);
-        FragColor = vec4(color, 1.0);
     }
 )";
 
@@ -139,6 +135,11 @@ int main_task_3_1() {
 
     // Transformation matrix for translation
     glm::mat4 translation = glm::translate(glm::mat4(1.0f), glm::vec3(0.5f, 0.5f, 0.0f));
+
+    // Use the shader program for the triangle
+    // NOTICE: the example I get from the tutorial does not have this line,
+    // but I failed to set the value of the uniform without this line.
+    glUseProgram(shaderProgram);
 
     // Set the transformation matrix in the shader
     unsigned int transformLoc = glGetUniformLocation(shaderProgram, "transform");

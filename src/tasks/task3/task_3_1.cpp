@@ -147,6 +147,9 @@ int main_task_3_1() {
     // Set the clear color
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
+    // Enable VSync to limit the frame rate
+    glfwSwapInterval(1);
+
     // Main rendering loop
     while (!glfwWindowShouldClose(window)) {
         // Clear the color buffer

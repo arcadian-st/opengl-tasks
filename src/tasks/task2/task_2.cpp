@@ -30,6 +30,11 @@ const char* fragmentShaderSource = R"(
     }
 )";
 
+// Callback function for handling framebuffer size changes
+void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+    glViewport(0, 0, width, height);
+}
+
 // Function to set up the window
 GLFWwindow* setupWindow() {
     // Initialize GLFW
@@ -62,6 +67,10 @@ GLFWwindow* setupWindow() {
         glfwTerminate();
         return nullptr;
     }
+
+    // Set up viewport and resize callback
+    glViewport(0, 0, 800, 600);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     return window;
 };

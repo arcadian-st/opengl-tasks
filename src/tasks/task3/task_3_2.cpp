@@ -14,6 +14,11 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+// Callback function for handling framebuffer size changes
+void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+    glViewport(0, 0, width, height);
+}
+
 // Vertex Shader with Transformation
 const char* vertexShaderSource = R"(
     #version 330 core
@@ -61,6 +66,10 @@ int main_task_3_2() {
         glfwTerminate();
         return -1;
     }
+
+    // Set up viewport and resize callback
+    glViewport(0, 0, 800, 600);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     // Load and compile shaders
     unsigned int vertexShader, fragmentShader;

@@ -1,5 +1,7 @@
 # OpenGL 任务
 
+*[English](https://github.com/arcadian-st/opengl-tasks/blob/main/README.md)* | *简体中文*
+
 12 个 OpenGL 的入门任务。
 
 该项目使用 GLFW 和 GLAD 创建了 12 个基础示例，每个示例都以前面的示例为基础构建，逐步介绍 OpenGL 的基本概念。
@@ -62,29 +64,29 @@
 
   可执行文件将从以下文件构建
 
-```
+  ```
   src/main.cpp
-```
+  ```
 
   任务示例放置在以下目录中
 
-```
+  ```
   src/tasks/
-```
+  ```
 
   修改上面的 main.cpp 文件，插入任务代码，如下所示：
 
-```
+  ```cpp
   #include "./tasks/task1/task_1.cpp"
 
   int main() {
       return main_task_1();
   }
-```
+  ```
 
-  所有任务的执行函数都以'main_'为前缀，可以在每个任务的代码中轻松找到。
+  所有任务的执行函数都以"main_"为前缀，可以在每个任务的代码中轻松找到。
 
-  GLFW、GLAD 和 GLM 的支持位于 include 和 lib 文件夹，以及 src/glad.c 文件。
+  GLFW、GLAD 和 GLM 的支持位于`include`和`lib`文件夹，以及`src/glad.c`文件。
 
 ### 构建
 
@@ -93,19 +95,19 @@
 
   以下是从项目根目录出发在终端上使用CMake构建项目的示例。
 
-```
+  ```
   mkdir build
   cd build
   cmake ..
   cmake --build .
   cd ..
-```
+  ```
 
   构建项目并返回到根目录后，你可以在终端中测试可执行文件。假设项目在"Debug"类型下构建，执行方法为：
 
-```
+  ```
   ./build/Debug/opengl-tasks
-```
+  ```
 
 ## 任务描述
 

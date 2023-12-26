@@ -1,5 +1,7 @@
 # OpenGL Tasks
 
+*English* | *[简体中文](https://github.com/arcadian-st/opengl-tasks/blob/main/README-zh.md)*
+
 12 tasks to get started with OpenGL.
 
 This project includes 12 examples to create different basic applications with GLFW and GLAD. 

@@ -28,9 +28,29 @@ const char* fragmentShaderSource = R"(
     }
 )";
 
+// Vertex data for circle lines
+const unsigned int numSegments = 36;
+float vertices_circle_lines[numSegments * 2];
+unsigned int VAO_circle_lines, VBO_circle_lines;
+
+void updateVertexDate(int width, int height) {
+    const float ratio = static_cast<float>(width) / static_cast<float>(height);
+
+    for (int i = 0; i < numSegments; ++i) {
+        float theta = 2.0f * 3.1415926f * static_cast<float>(i) / static_cast<float>(numSegments);
+        vertices_circle_lines[i * 2] = 0.5f * cos(theta); // X coordinate
+        vertices_circle_lines[i * 2 + 1] = 0.5f * sin(theta) * ratio; // Y coordinate
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO_circle_lines);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices_circle_lines), vertices_circle_lines);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
 // Callback function for handling framebuffer size changes
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
+    updateVertexDate(width, height);
 }
 
 int main_task_2_3() {
@@ -66,7 +86,7 @@ int main_task_2_3() {
     }
 
     // Set up viewport and resize callback
-    glViewport(0, 0, 800, 600);
+    glViewport(0, 0, width, height);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     // Load and compile shaders
@@ -114,18 +134,9 @@ int main_task_2_3() {
     glDeleteShader(fragmentShader);
 
     // Vertex data for circle lines
-    const int numSegments = 36;
-    float vertices_circle_lines[numSegments * 2];
-    const float ratio = static_cast<float>(width) / static_cast<float>(height);
-
-    for (int i = 0; i < numSegments; ++i) {
-        float theta = 2.0f * 3.1415926f * static_cast<float>(i) / static_cast<float>(numSegments);
-        vertices_circle_lines[i * 2] = 0.5f * cos(theta); // X coordinate
-        vertices_circle_lines[i * 2 + 1] = 0.5f * sin(theta) * ratio; // Y coordinate
-    }
+    updateVertexDate(width, height);    
 
     // Vertex Array Object (VAO) and Vertex Buffer Object (VBO) for circle lines
-    unsigned int VAO_circle_lines, VBO_circle_lines;
     glGenVertexArrays(1, &VAO_circle_lines);
     glGenBuffers(1, &VBO_circle_lines);
 

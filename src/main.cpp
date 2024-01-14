@@ -1,5 +1,5 @@
-#include "tasks/task4/task_4.cpp"
+#include "tasks/task5/task_5.cpp"
 
 int main() {
-    return main_task_4();
+    return main_task_5();
 }
